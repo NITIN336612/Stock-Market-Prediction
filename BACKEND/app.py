@@ -197,6 +197,24 @@ def database_status():
 
 
 # ============================================================
+# API — NEXT TRADING DAY PREDICTION
+# ============================================================
+
+@app.route("/api/predictions/next-day")
+def next_day_prediction():
+
+    try:
+        predictions = predict_next_day()
+        return jsonify(predictions)
+
+    except Exception as error:
+
+        return jsonify({
+            "error": str(error)
+        }), 500
+
+
+# ============================================================
 # START APPLICATION
 # ============================================================
 
@@ -213,20 +231,3 @@ if __name__ == "__main__":
         port=5000,
         debug=True
     )
-    
-# ============================================================
-# API — NEXT TRADING DAY PREDICTION
-# ============================================================
-
-@app.route("/api/predictions/next-day")
-def next_day_prediction():
-
-    try:
-        predictions = predict_next_day()
-        return jsonify(predictions)
-
-    except Exception as error:
-
-        return jsonify({
-            "error": str(error)
-        }), 500
