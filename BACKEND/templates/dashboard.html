@@ -61,7 +61,15 @@ footer{color:var(--muted);text-align:center;font-size:12px;padding:30px 10px}
   </div>
 </header>
 <main>
-  <div class="section-head"><div><h2>Market snapshot</h2><p>Latest available market session from the local dataset</p></div><span class="tag" id="marketDate">Loading market date…</span></div>
+  <div class="section-head">
+    <div>
+        <h2>Market snapshot</h2>
+        <p>
+            Dashboard date (India): <span id="dashboardDate">Loading date...</span>
+            · Latest market session: <span id="marketDate">Loading...</span>
+        </p>
+    </div>
+</div>
   <div class="grid metrics">
     <div class="panel"><div class="metric-label">NIFTY 50 CLOSE</div><div class="metric-value" id="latestClose">—</div><div class="metric-foot">Latest stored closing value</div></div>
     <div class="panel"><div class="metric-label">HISTORICAL SESSIONS</div><div class="metric-value" id="recordCount">—</div><div class="metric-foot">Rows in stock database</div></div>
@@ -130,6 +138,16 @@ footer{color:var(--muted);text-align:center;font-size:12px;padding:30px 10px}
 const fmt = n => n == null ? "—" : Number(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
 const layoutBase = {paper_bgcolor:"rgba(0,0,0,0)",plot_bgcolor:"rgba(0,0,0,0)",font:{color:"#c6d5e6"},margin:{l:55,r:20,t:18,b:45},xaxis:{gridcolor:"#23364d"},yaxis:{gridcolor:"#23364d"},showlegend:false};
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error(`${url}: HTTP ${r.status}`);return r.json();}
+function updateDashboardDate() {
+    const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).format(new Date());
+
+    document.getElementById("dashboardDate").textContent = today;
+}
 async function loadSnapshot(){
  const [status,latest]=await Promise.all([getJSON("/api/status"),getJSON("/api/stocks/latest")]);
  document.getElementById("latestClose").textContent="₹"+fmt(latest.close);
@@ -227,7 +245,12 @@ async function refresh(){
 }
 document.getElementById("historyLimit").addEventListener("change",loadHistory);
 document.getElementById("trainingModel").addEventListener("change",loadTrainingModel);
+
+updateDashboardDate();
+
 refresh();
+
+setInterval(updateDashboardDate, 60000);
 </script>
 </body>
 </html>
